@@ -13,14 +13,11 @@ mkdir $dirname
 
 #http://stackoverflow.com/questions/7577615/parallel-wget-in-bash
 cat nfl_team_roster_pages.txt | sed 's_http://www\.\([a-z0-9]*\)\.com.*_-P'$dirname'/\1 &_' | xargs -n 2 -P 16 wget 
-#cat nfl_team_roster_pages.txt | xargs -n 1 -P 16 wget -P$dirname
 
-cd $dirname
-echo 'in $dirname'
-grep col-weight\"\>[0-9] * > weightlines.txt
-sed -r 's/.*([0-9][0-9][0-9]).*/\1/' <weightlines.txt >weights.txt
-echo 'complete'
+find $dirname/ -type f -print0 | xargs -n1 -0 -P32 grep -H col-weight\"\>[0-9] > weightlines.txt
 
-#change awk delims to td/tr tags...
-#from http://stackoverflow.com/questions/6854586/extract-data-from-html-table-with-bash-script
-#awk -F "</*td>|</*tr>" '{print }' < weights.txt | sed -e s/(\d+)/$/
+sed -r 's_.*/([a-z]*)/.*([0-9][0-9][0-9]).*_\1 \2_' < weightlines.txt > weights.txt
+
+
+
+
